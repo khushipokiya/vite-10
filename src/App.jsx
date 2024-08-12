@@ -1,6 +1,5 @@
-// src/App.jsx
 import React from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import TodoForm from './components/TodoForm';
 import TodoListView from './components/TodoListView';
 import { useDispatch } from 'react-redux';
@@ -11,12 +10,14 @@ const API_URL = 'https://66b6ec8d7f7b1c6d8f1a74d1.mockapi.io/api/v1/todolist';
 const App = () => {
   const dispatch = useDispatch();
   
-
   // Fetch initial todos and set in state
   React.useEffect(() => {
     const fetchTodos = async () => {
       try {
         const response = await fetch(API_URL);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
         const data = await response.json();
         dispatch(setTodos(data));
       } catch (error) {
@@ -35,10 +36,15 @@ const App = () => {
       <Routes>
         <Route path="/" element={<TodoForm />} />
         <Route path="/todos" element={<TodoListView />} />
+        <Route
+          path="/edit/:id"
+          element={
+            <TodoForm/>
+          }
+        />
       </Routes>
     </div>
   );
 };
-
 
 export default App;

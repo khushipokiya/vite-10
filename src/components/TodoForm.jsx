@@ -1,8 +1,7 @@
-// src/components/TodoForm.jsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { addTodo } from '../redux/todoSlice';
+import { addTodo, updateTodo } from '../redux/todoSlice';
 
 const TodoForm = () => {
   const [title, setTitle] = useState('');
@@ -10,9 +9,19 @@ const TodoForm = () => {
   const [dueDate, setDueDate] = useState('');
   const [priority, setPriority] = useState('Low');
   const [error, setError] = useState('');
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+  const todo = location.state?.todo;
+
+  useEffect(() => {
+    if (todo) {
+      setTitle(todo.title);
+      setDescription(todo.description);
+      setDueDate(todo.dueDate);
+      setPriority(todo.priority);
+    }
+  }, [todo]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,30 +39,32 @@ const TodoForm = () => {
     };
 
     try {
-      // Assume the backend call here
-      const response = await fetch('https://66b6ec8d7f7b1c6d8f1a74d1.mockapi.io/api/v1/todolist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newTodo),
-      });
-      const createdTodo = await response.json();
-      dispatch(addTodo(createdTodo));
-
-      // Redirect to the todos page
+      if (todo) {
+        // Update existing todo
+        const updatedTodo = { ...todo, ...newTodo };
+        dispatch(updateTodo(updatedTodo));
+      } else {
+        // Add new todo
+        const response = await fetch('https://66b6ec8d7f7b1c6d8f1a74d1.mockapi.io/api/v1/todolist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newTodo),
+        });
+        const createdTodo = await response.json();
+        dispatch(addTodo(createdTodo));
+      }
       navigate('/todos');
     } catch (error) {
-      console.error('Failed to add todo:', error);
+      console.error('Failed to save todo:', error);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="max-w-lg p-6 mx-auto bg-white rounded-lg shadow-md">
-      <h2 className="mb-4 text-xl font-semibold">Add New Todo</h2>
+      <h2 className="mb-4 text-xl font-semibold">{todo ? 'Edit Todo' : 'Add New Todo'}</h2>
       {error && <p className="mb-4 text-red-500">{error}</p>}
       <div className="mb-4">
-        <label htmlFor="title" className="block mb-1 text-sm font-medium text-gray-700">
-          Title
-        </label>
+        <label htmlFor="title" className="block mb-1 text-sm font-medium text-gray-700">Title</label>
         <input
           id="title"
           type="text"
@@ -64,9 +75,7 @@ const TodoForm = () => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="description" className="block mb-1 text-sm font-medium text-gray-700">
-          Description
-        </label>
+        <label htmlFor="description" className="block mb-1 text-sm font-medium text-gray-700">Description</label>
         <textarea
           id="description"
           value={description}
@@ -77,9 +86,7 @@ const TodoForm = () => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="dueDate" className="block mb-1 text-sm font-medium text-gray-700">
-          Due Date
-        </label>
+        <label htmlFor="dueDate" className="block mb-1 text-sm font-medium text-gray-700">Due Date</label>
         <input
           id="dueDate"
           type="date"
@@ -89,9 +96,7 @@ const TodoForm = () => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="priority" className="block mb-1 text-sm font-medium text-gray-700">
-          Priority
-        </label>
+        <label htmlFor="priority" className="block mb-1 text-sm font-medium text-gray-700">Priority</label>
         <select
           id="priority"
           value={priority}
@@ -107,7 +112,7 @@ const TodoForm = () => {
         type="submit"
         className="w-full px-4 py-2 text-white bg-blue-500 rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
       >
-        Add Todo
+        {todo ? 'Update Todo' : 'Add Todo'}
       </button>
     </form>
   );
