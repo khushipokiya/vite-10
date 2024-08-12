@@ -11,7 +11,7 @@ const TodoListView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Fetch todos on component mount
+  // Fetch todos 
   useEffect(() => {
     const fetchTodos = async () => {
       try {
