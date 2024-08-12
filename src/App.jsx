@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, Link} from 'react-router-dom';
 import axios from 'axios';
 import TodoForm from './components/TodoForm';
 import TodoListView from './components/TodoListView';
@@ -38,10 +38,8 @@ const App = () => {
         <Route
           path="/edit/:id"
           element={
-            <TodoForm
-              
-            />
-          }
+            <TodoForm/>
+            }
         />
       </Routes>
     </div>
