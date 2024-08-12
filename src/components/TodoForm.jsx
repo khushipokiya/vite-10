@@ -1,14 +1,20 @@
 // src/components/TodoForm.jsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { addTodo } from '../redux/todoSlice';
 
-const TodoForm = ({ addTodo }) => {
+const TodoForm = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [priority, setPriority] = useState('Low');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (title.trim() === '') {
       setError('Title is required');
@@ -23,11 +29,21 @@ const TodoForm = ({ addTodo }) => {
       priority,
     };
 
-    addTodo(newTodo);
-    setTitle('');
-    setDescription('');
-    setDueDate('');
-    setPriority('Low');
+    try {
+      // Assume the backend call here
+      const response = await fetch('https://66b6ec8d7f7b1c6d8f1a74d1.mockapi.io/api/v1/todolist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newTodo),
+      });
+      const createdTodo = await response.json();
+      dispatch(addTodo(createdTodo));
+
+      // Redirect to the todos page
+      navigate('/todos');
+    } catch (error) {
+      console.error('Failed to add todo:', error);
+    }
   };
 
   return (
