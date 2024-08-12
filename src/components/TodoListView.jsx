@@ -42,8 +42,8 @@ const TodoListView = () => {
   return (
     <div>
       <h1 className="mb-4 text-2xl font-bold">Todo List</h1>
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+      <table className="min-w-full divide-y divide-gray-400">
+        <thead className="bg-gray-200">
           <tr>
             <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Title</th>
             <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Description</th>
