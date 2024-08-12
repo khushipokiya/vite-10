@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import TodoForm from './components/TodoForm';
 import TodoListView from './components/TodoListView';
 import { useDispatch } from 'react-redux';
@@ -10,16 +11,14 @@ const API_URL = 'https://66b6ec8d7f7b1c6d8f1a74d1.mockapi.io/api/v1/todolist';
 const App = () => {
   const dispatch = useDispatch();
   
+ 
+
   // Fetch initial todos and set in state
   React.useEffect(() => {
     const fetchTodos = async () => {
       try {
-        const response = await fetch(API_URL);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        dispatch(setTodos(data));
+        const response = await axios.get(API_URL);
+        dispatch(setTodos(response.data));
       } catch (error) {
         console.error('Failed to fetch todos:', error);
       }
@@ -39,7 +38,9 @@ const App = () => {
         <Route
           path="/edit/:id"
           element={
-            <TodoForm/>
+            <TodoForm
+              
+            />
           }
         />
       </Routes>

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import axios from 'axios';
 import { addTodo, updateTodo } from '../redux/todoSlice';
 
-const TodoForm = () => {
+const API_URL = 'https://66b6ec8d7f7b1c6d8f1a74d1.mockapi.io/api/v1/todolist';
+
+const TodoForm = ({ initialTodo }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
@@ -12,7 +15,7 @@ const TodoForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const todo = location.state?.todo;
+  const todo = initialTodo || location.state?.todo;
 
   useEffect(() => {
     if (todo) {
@@ -41,17 +44,12 @@ const TodoForm = () => {
     try {
       if (todo) {
         // Update existing todo
-        const updatedTodo = { ...todo, ...newTodo };
-        dispatch(updateTodo(updatedTodo));
+        await axios.put(`${API_URL}/${todo.id}`, newTodo);
+        dispatch(updateTodo({ ...todo, ...newTodo }));
       } else {
         // Add new todo
-        const response = await fetch('https://66b6ec8d7f7b1c6d8f1a74d1.mockapi.io/api/v1/todolist', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newTodo),
-        });
-        const createdTodo = await response.json();
-        dispatch(addTodo(createdTodo));
+        const response = await axios.post(API_URL, newTodo);
+        dispatch(addTodo(response.data));
       }
       navigate('/todos');
     } catch (error) {
